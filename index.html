@@ -485,6 +485,24 @@
   .opt:active,.opt.picked{ background:#FFE3CF; }
   .btn.start{ color:#FF8A3D; }
   @media (max-width:420px){ .hero h1{ font-size:35px; } }
+  .jumpbuy{ display:block; width:100%; margin:-2px 0 16px; padding:12px 10px 10px; cursor:pointer;
+    background:#173549; color:#FF8A3D; border:2.5px solid #171310; border-radius:14px; box-shadow:3px 4px 0 #171310;
+    font-family:var(--heavy); font-size:20px; letter-spacing:.5px; }
+  .jumpbuy:active{ transform:translate(2px,3px); box-shadow:1px 1px 0 #171310; }
+  .jumpbuy .arr{ display:inline-block; animation:jbob 1.2s ease-in-out infinite; }
+  @keyframes jbob{ 0%,100%{ transform:translateY(0) } 50%{ transform:translateY(4px) } }
+  .bookcard{ display:flex; gap:12px; align-items:center; margin:16px 0 0; padding:12px;
+    background:#FFF6EA; border:2.5px solid #171310; border-radius:14px; box-shadow:3px 4px 0 #171310; text-align:left; }
+  .bookcard img{ flex:0 0 80px; width:80px; height:auto; border:2px solid #171310; border-radius:4px; box-shadow:2px 3px 0 rgba(23,19,16,.25); }
+  .bookcard .bc-txt{ min-width:0; }
+  .bookcard p{ margin:0; }
+  .bc-kick{ font-family:var(--display); font-size:12px; color:#2E9E86; }
+  .bc-title{ font-family:var(--heavy); font-size:19px; line-height:1.2; color:#171310; margin:1px 0 3px !important; letter-spacing:-.2px; }
+  .bc-desc{ font-size:12.5px; line-height:1.45; color:#4A423A; word-break:keep-all; }
+  .bc-desc b{ white-space:nowrap; color:#171310; background:linear-gradient(transparent 58%, #FFD46F 58%); }
+  .lede{ word-break:keep-all; }
+  .bc-tags{ display:flex; flex-wrap:wrap; gap:4px; margin-top:6px; }
+  .bc-tags span{ font-family:var(--display); font-size:11px; background:#173549; color:#fff; border-radius:999px; padding:3px 8px 2px; white-space:nowrap; }
 </style>
 </head>
 <body class="sun">
@@ -511,7 +529,7 @@
           <h1>세계 문학 인물은?</h1>
           <p class="by">《바로 보고 바로 쓰는 세계 문학》 인물 테스트</p>
         </div>
-        <p class="lede">10개의 질문에 답하면 책 속 다섯 영웅 중<br/><b>나와 가장 닮은 인물</b>을 알려드려요.</p>
+        <p class="lede">초·중·고 선생님들이 엄선한 <b>세계 문학 30선</b>,<br/>그 속에서 <b>나와 가장 닮은 인물</b>은?</p>
         <div class="cast" id="cast"></div>
         <div class="steps" aria-label="문해력 4단계">
           <span>보고</span><em>→</em><span>이해하고</span><em>→</em><span>생각하고</span><em>→</em><span>쓴다!</span>
@@ -523,6 +541,15 @@
           <li>결과는 이미지로 저장해 친구에게 공유할 수 있어요</li>
         </ul>
         <button class="btn start" onclick="startQuiz()">테스트 시작하기 →</button>
+        <div class="bookcard">
+          <img id="bookcard-cover" alt="바로 보고 바로 쓰는 세계 문학 표지" />
+          <div class="bc-txt">
+            <p class="bc-kick">이 테스트는 이 책에서 나왔어요</p>
+            <p class="bc-title">바로 보고 바로 쓰는<br/>세계 문학</p>
+            <p class="bc-desc">초·중·고 선생님들이 직접 고르고 쓴 세계 문학 30선으로 <b>서·논술형 평가</b>까지 대비해요</p>
+            <div class="bc-tags"><span>현직 교사 184명 추천</span><span>이은경 선생님 강력 추천</span></div>
+          </div>
+        </div>
       </section>
 
       <!-- 문항 -->
@@ -571,6 +598,7 @@
           </svg>
           <div class="tagline"><span class="hand">☞</span><span id="r-tagline"></span><span class="hand flip">☞</span></div>
         </div>
+        <button type="button" class="jumpbuy" onclick="jumpToBuy()">📚 이 책 바로 구매하기 <span class="arr">↓</span></button>
 
         <div class="sect">
           <h3 class="pillh"><i class="pix pix-mag"></i>인물 바로 보기</h3>
@@ -609,7 +637,7 @@
           </div>
         </div>
 
-        <div class="bookteaser">
+        <div class="bookteaser" id="buyzone">
           <p class="kick">요즘 초등학생을 위한 세계 문학 30선</p>
           <p class="head">이 인물의 <em>진짜 이야기</em>는<br/>책에서 만나요!</p>
           <div class="bookwrap">
@@ -856,6 +884,7 @@ function safeReplace(url){
 /* ── 시작 화면 ── */
 function init(){
   $('coversticker').src = COVER;
+  $('bookcard-cover').src = COVER;
   $('book3d').src = BOOK3D;
   $('r-buy').innerHTML = CONFIG.STORES.map(s =>`<a class="buy" href="${s.url}" target="_blank" rel="noopener"><b>${s.name}</b><span>바로가기 →</span></a>`).join('');
   $('r-note').textContent = CONFIG.EVENT_LINE || "";
@@ -1089,7 +1118,7 @@ async function drawCard(){
   g.font = '34px "Black Han Sans", Jua, sans-serif';
   g.fillText("《" + CONFIG.BOOK_TITLE + "》", W/2, 1204);
   g.fillStyle = "#8A8078"; g.font = '24px "Noto Sans KR", sans-serif';
-  g.fillText("이 영웅의 진짜 이야기는 책에서 만나 보세요", W/2, 1240);
+  g.fillText("이 인물의 진짜 이야기는 책에서 만나 보세요", W/2, 1240);
   return cv;
 }
 function wrap(g, text, maxW, maxLines){
@@ -1178,6 +1207,10 @@ const META_PIXEL_ID = "2029097181121435";   // ← 따옴표 안에 메타 픽�
     }
   });
 })();
+  function jumpToBuy(){
+    try{ if (window.fbq && META_PIXEL_ID) fbq('trackCustom','BuyJump'); }catch(e){}
+    const z = document.getElementById('buyzone'); if (z) z.scrollIntoView({ behavior:'smooth', block:'start' });
+  }
   init();
 </script>
 </body>
